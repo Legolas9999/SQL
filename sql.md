@@ -120,7 +120,6 @@ after 字段名称：把新添加字段放在指定字段的后面
 rename table 旧名称 to 新名称;
 # 或者
 alter table 旧名称  rename  新名称;
-
 ```
 
 
@@ -181,7 +180,7 @@ drop table 数据表名称;
 
 ③ 日期类型
 
-| 份额里       | 类型名称                                                     |
+| 名称       | 说明                                                     |
 | ------------ | ------------------------------------------------------------ |
 | year         | YYYY 1901~2155                                               |
 | ==time==     | HH:MM:SS -838:59:59~838:59:59                                |
@@ -207,106 +206,65 @@ drop table 数据表名称;
 >
 > 超过255个字符，选择text文本类型！
 
-# 八、DML数据操作语言
+| **类型名称**   | **说明**                             |
+| -------------- | ------------------------------------ |
+| enum    | 枚举类型，只能从给定的值中选择一个，gender enum('男','女','保密')   |
 
-## 1、DML包括哪些SQL语句
 
-insert插入、update更新、delete删除
 
-## 2、数据的增删改（重点）
-
-英语小课堂：
-
-增加：insert
-
-删除：delete
-
-修改：update
-
-### ☆ 数据的增加操作
+## 数据的增加操作
 
 基本语法：
 
 ```sql
-mysql> insert into 数据表名称([字段1,字段2,字段3...]) values (字段1的值,字段2的值,字段3的值...);
+insert into 数据表名称[(字段1,字段2,字段3...)] values (字段1的值,字段2的值,字段3的值...);
 ```
 
 > 特别注意：在SQL语句中，除了数字，其他类型的值，都需要使用引号引起来，否则插入时会报错。
-
-第一步：准备一个数据表
-
-```sql
-mysql> use db_itheima;
-mysql> create table tb_user(
-	id int,
-	username varchar(20),
-	age tinyint unsigned,
-	gender enum('男','女','保密'),
-	address varchar(255)
-) engine=innodb default charset=utf8;
-```
 
 > unsigned代表无符号型，只有0到正数。tinyint unsigned无符号型，范围0 ~ 255
 
 > enum枚举类型，多选一。只能从给定的值中选择一个
 
-第二步：使用insert语句插入数据
+- 使用insert语句插入单条数据
 
 ```sql
-mysql> insert into tb_user values (1,'刘备',34,'男','广州市天河区');
-mysql> insert into tb_user(id,username,age) values (2,'关羽',33);
+insert into 表名 values (字段1的值,字段2的值,字段3的值...);
+insert into 表名(字段1,字段2,字段3...) values (字段1的值,字段2的值,字段3的值...);
 ```
 
-第三步：批量插入多条数据
+- 批量插入多条数据
 
 ```sql
-mysql> insert into tb_user values (3,'大乔',19,'女','上海市浦东新区'),(4,'小乔',18,'女','上海市浦东新区'),(5,'马超',26,'男','北京市昌平区');
+insert into 表名 values (字段1的值,字段2的值,字段3的值...),(字段1的值,字段2的值,字段3的值...),(字段1的值,字段2的值,字段3的值...);
 ```
 
-### ☆ 数据的修改操作
+## 数据的修改操作
 
 基本语法：
 
 ```sql
-mysql> update 数据表名称 set 字段1=更新后的值,字段2=更新后的值,... where 更新条件;
+update 数据表名称 set 字段1=更新后的值,字段2=更新后的值,... where 更新条件;
 ```
 
 > 特别说明：如果在更新数据时，不指定更新条件，则其会把这个数据表的所有记录全部更新一遍。
 
-案例：修改username='马鹏'这条记录，将其性别更新为男，家庭住址更新为广东省深圳市
 
-```sql
-mysql> update tb_user set gender='男',address='广东省深圳市' where username='马鹏';
-```
-
-案例：今年是2020年，假设到了2021年，现在存储的学员年龄都差1岁，整体进行一次更新
-
-```sql
-mysql> update tb_user set age=age+1;
-```
-
-###  ☆ 数据的删除操作
+## 数据的删除操作
 
 基本语法：
 
 ```sql
-mysql> delete from 数据表名称 [where 删除条件];
+delete from 数据表名称 [where 删除条件];
 ```
-
-案例：删除tb_user表中，id=1的用户信息
-
-```sql
-mysql> delete from tb_user where id=1;
-```
-
 
 
 delete from与truncate清空数据表操作
 
 ```sql
-mysql> delete from 数据表;
+delete from 数据表;
 或
-mysql> truncate 数据表;
+truncate 数据表;
 ```
 
 
@@ -315,7 +273,7 @@ delete from与truncate区别在哪里？
 
 - delete：删除==数据记录==
   - 数据操作语言（DML）
-  - 删除==大量==记录速度慢，==只删除数据，主键自增序列不清零==
+  - 删除==大量==记录速度慢，==只删除数据，主键自增序列不清零== (例如：删除最后一条数据，其id为5，再添加一条数据时，想让新数据id还是5，但实际是6。-->12346)
   - 可以==带条件==删除
 - truncate：删除==所有数据记录==
   - 数据定义语言（DDL）
