@@ -405,24 +405,9 @@ create table person(
 
 比如：有两张数据表，这两个数据表之间==有联系==，通过了==某个字段==可以建立连接，这个字段在其中一个表中是==主键==，在另外一张表中，我们就把其称之为==外键==。
 
-foreign key
+当主键表的数据发生变化，则与之关联的表也发生变化
 
-手机分类（iPhone 13 Pro，Mi MAX，HuaWei）
-
-分类表
-
-手机
-
-
-
-产品表
-
-iPhone 13 Pro
-
-Mi MAX
-
-HuaWei
-
+![](https://github.com/user-attachments/assets/34c7a75f-d050-4fe2-acde-156eaad511a9)
 ## 6、小结
 
 主键约束：唯一标示，不能重复，不能为空。
