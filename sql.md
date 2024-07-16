@@ -96,7 +96,7 @@ show tables;
 ## 显示数据表的信息（编码格式、字段等信息）
 
 ```sql
-desc 数据表名称;
+desc 表名;
 ```
 
 ## 输出建表语句
@@ -280,33 +280,49 @@ delete from与truncate区别在哪里？
   - 清里大量数据==速度快==，==主键自增序列清零==
   - ==不能带条件删除==
 
-# 九、SQL约束
+# SQL约束
 
 ## 1、主键约束
 
-1、PRIMARY KEY 约束唯一标识数据库表中的每条记录。
-2、主键必须包含唯一的值。
-3、主键列不能包含 NULL 值。
-4、每个表都应该有一个主键，并且每个表只能有一个主键。
+1、PRIMARY KEY 约束唯一标识数据库表中的每条记录。<br>
+2、主键必须包含`唯一`的值。<br>
+3、主键列`不能包含 NULL` 值。<br>
+4、每个表都应该有一个主键，并且每个表只能有一个主键。<br>
 
-遵循原则：
+遵循原则：<br>
+1）主键应当是对用户没有意义的<br>
+2）永远也不要更新主键。<br>
+3）主键不应包含动态变化的数据，如时间戳、创建时间列、修改时间列等。<br>
+4） 主键应当由计算机自动生成。<br>
 
-1）主键应当是对用户没有意义的
-2）永远也不要更新主键。
-3）主键不应包含动态变化的数据，如时间戳、创建时间列、修改时间列等。
-4） 主键应当由计算机自动生成。
-
-创建主键约束：创建表时，在字段描述处，声明指定字段为主键
-
-![image-20210906183745166](media/image-20210906183745166.png)
-
-删除主键约束：如需撤销 PRIMARY KEY 约束，请使用下面的 SQL
-
+- 创建主键约束：创建表时，在字段描述处，声明指定字段为主键
 ```sql
-alter table persons2 drop primary key;
+create table person(
+  id int primary key,       #主键约束
+  first_name varchar(255),
+  last_name varchar(255)
+);
+
+# 或者
+
+create table person(
+  id int,       
+  first_name varchar(255),
+  last_name varchar(255),
+  primary key(id)           #主键约束
+);
+
+# 或者
+
+alter table 表名 add primary key(字段名);
 ```
 
-![image-20210906183908865](media/image-20210906183908865.png)
+
+- 删除主键约束：如需撤销 PRIMARY KEY 约束，请使用下面的 SQL
+
+```sql
+alter table 表名 drop primary key;
+```
 
 
 
@@ -335,9 +351,6 @@ insert into persons3(first_name,last_name) values('Bill','Gates');
 insert into persons3(id,first_name,last_name) values(null,'Bill','Gates');
 ```
 
-运行效果：
-
-![image-20210906184220825](media/image-20210906184220825.png)
 
 ## 2、非空约束
 
@@ -345,22 +358,46 @@ NOT NULL 约束强制列不接受 NULL 值。
 NOT NULL 约束强制字段始终包含值。这意味着，如果不向字段添加值，就无法插入新记录或者更新记录。
 下面的 SQL 语句强制 "id" 列和 "last_name" 列不接受 NULL 值：
 
-![image-20210906184938237](media/image-20210906184938237.png)
+```sql
+create table person(
+  id int primary key,       #主键约束
+  first_name varchar(255) not null,  #非空约束
+  last_name varchar(255)
+);
+```
+
 
 ## 3、唯一约束
 
-UNIQUE 约束唯一标识数据库表中的每条记录。
-UNIQUE 和 PRIMARY KEY 约束均为列或列集合提供了唯一性的保证。
-PRIMARY KEY 拥有自动定义的 UNIQUE 约束。
+UNIQUE 约束`唯一标识`数据库表中的每条记录。<br>
+UNIQUE 和 PRIMARY KEY 约束均为列或列集合提供了唯一性的保证。<br>
+PRIMARY KEY 拥有自动定义的 UNIQUE 约束。<br>
+UNIQUE 约束可以为null
+
 
 请注意：
 每个表可以有多个 UNIQUE 约束，但是每个表只能有一个 PRIMARY KEY 约束。
 
-![image-20210906185040009](media/image-20210906185040009.png)
+```sql
+create table person(
+  id int primary key,       #主键约束
+  first_name varchar(255) not null,  #非空约束
+  last_name varchar(255) unique      # 唯一约束
+);
+```
 
 ## 4、默认值约束
 
 default 默认值
+
+```sql
+create table person(
+  id int primary key,       #主键约束
+  first_name varchar(255) not null,  #非空约束
+  last_name varchar(255) unique,      # 唯一约束
+  gender enum('男','女') default '男'  # 默认值
+);
+```
 
 ## 5、外键约束(了解)
 
