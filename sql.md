@@ -606,6 +606,8 @@ SELECT MAX(price),MIN(price) FROM product;
 
 分组查询就是将查询结果按照指定字段进行分组，字段中数据相等的分为一组。
 
+分组的目的就是为了聚合！
+
 **分组查询基本的语法格式如下：**
 
 GROUP BY 列名 [HAVING 条件表达式] [WITH ROLLUP]
@@ -614,7 +616,7 @@ GROUP BY 列名 [HAVING 条件表达式] [WITH ROLLUP]
 
 - 列名: 是指按照指定字段的值进行分组。
 - HAVING 条件表达式: 用来过滤分组后的数据。
-- WITH ROLLUP：在所有记录的最后加上一条记录，显示select查询时聚合函数的统计和计算结果
+- WITH ROLLUP：在所有记录的最后加上一条记录，显示select查询时聚合函数的统计和计算结果!!! 回溯统计
 
 ### ☆ group by的使用
 
@@ -640,11 +642,15 @@ select gender,avg(age) from students group by gender;
 select gender,count(*) from students group by gender;
 ```
 
-![image-20210330145259415](media/image-20210330145259415.png)
+![image-20210330145259415](https://github.com/user-attachments/assets/0989bcb7-461a-4668-8ce6-8007836fa1bf)
 
 ### ☆ group by + having的使用
 
 having作用和where类似都是过滤数据的，但having是过滤分组数据的，只能用于group by
+
+- where 用于分组前
+
+- having 用于分组后
 
 ```sql
 -- 根据gender字段进行分组，统计分组条数大于2的
@@ -706,7 +712,7 @@ select * from students cross join classes;
 select * from students, classes;
 ```
 
-![image-20210330160813460](media/image-20210330160813460.png)
+![image-20210330160813460](https://github.com/user-attachments/assets/5ebe287a-624c-4b08-91a7-f388b399da7c)
 
 ## 1、内连接
 
@@ -724,12 +730,16 @@ select * from students, classes;
 
 查询两个表中符合条件的共有记录
 
-![image-20210329231722765](media/image-20210329231722765.png)
+![image-20210329231722765](https://github.com/user-attachments/assets/a3c969a9-ac4e-4091-bdee-9d1196a972e9)
 
 **内连接查询语法格式:**
 
 ```sql
-select 字段 from 表1 inner join 表2 on 表1.字段1 = 表2.字段2
+select 字段 from 表1 [inner] join 表2 on 表1.字段1 = 表2.字段2;
+
+# 或者
+
+select 字段 from 表1, 表2 where 表1.字段1 = 表2.字段2;
 ```
 
 **说明:**
@@ -752,14 +762,14 @@ select * from students as s inner join classes as c on s.cls_id = c.id;
 
 ### ☆ 左连接查询
 
-以左表为主根据条件查询右表数据，如果根据条件查询右表数据不存在使用null值填充
+`以左表为主`根据条件查询右表数据，如果根据条件查询右表数据不存在使用`null`值填充
 
-![image-20210329232043956](media/image-20210329232043956.png)
+![image-20210329232043956](https://github.com/user-attachments/assets/09bc2f6b-d5b9-479b-a3f8-0a6ea8ffcef5)
 
 **左连接查询语法格式:**
 
 ```sql
-select 字段 from 表1 left join 表2 on 表1.字段1 = 表2.字段2
+select 字段 from 表1 left [outer] join 表2 on 表1.字段1 = 表2.字段2
 ```
 
 **说明:**
@@ -791,7 +801,7 @@ select * from students as s left join classes as c on s.cls_id = c.id;
 **右连接查询语法格式:**
 
 ```sql
-select 字段 from 表1 right join 表2 on 表1.字段1 = 表2.字段2
+select 字段 from 表1 right [outer] join 表2 on 表1.字段1 = 表2.字段2
 ```
 
 **说明:**
@@ -806,13 +816,129 @@ select 字段 from 表1 right join 表2 on 表1.字段1 = 表2.字段2
 ```sql
 select * from students as s right join classes as c on s.cls_id = c.id;
 ```
+## 4、自连接
+自己和自己连接，数据之间存在层级关系，记得要取别名
 
+## 5、表与表的关系
+①一对一
+![](https://github.com/user-attachments/assets/48f5669a-951f-4589-b38c-c16848320fee)
+②多对一
+![](https://github.com/user-attachments/assets/c2479af5-b57a-4130-84f0-50a278400581)
+
+③多对多 需要建立一张临时表
+![](https://github.com/user-attachments/assets/53c92408-e409-4dbe-a44f-a746f58feeba)
 ### ☆ 小结
 
 - 右连接使用right join .. on .., on 表示两个表的连接查询条件
 - 右连接以右表为主根据条件查询左表数据，左表数据不存在使用null值填充。
 
-# 十二、子查询(三步走)
+# 十二、外键约束（扩展）
+
+主键：primary key
+
+外键：foreign key（应用场景：在两表或多表关联的时候设置的，用于标志两个表之间的关联关系）
+
+```powershell
+create  table 数据表名称(
+	字段名称  字段类型  字段约束[5种情况]
+) default charset=utf8;
+```
+
+① 主键约束primary key
+
+② 默认值约束default
+
+③ 非空约束not null
+
+④ 唯一约束unique key
+
+⑤ 外键约束foreign key
+
+原则：在一张表中，其是主键。但是在另外一张表中，其是从键（非主键），但是这个字段是两张表的关联字段，我们把这个字段就称之为外键。
+
+## 1、外键约束作用
+
+外键约束:对外键字段的值进行更新和插入时会和引用表中字段的数据进行验证，数据如果不合法则更新和插入会失败，保证数据的有效性。如果合法就会建立关联关系，当我们在外键所在表中进行操作时，另外一个表中的数据也会受到关联。
+
+dage表：
+
+| id编号（主键） | name姓名 |
+| -------------- | -------- |
+| 1              | 陈浩南   |
+| 2              | 乌鸦哥   |
+
+xiaodi表：
+
+| id编号（主键） | name姓名   | dage_id（`外键`） |
+| -------------- | ---------- | --------------- |
+| 1              | 山鸡       | 1               |
+| 2              | 大天二     | 1               |
+| 3              | 乌鸦的小弟 | 2               |
+
+> 外键设计原则：保证两张表的关联关系，保证数据的一致性。在选择时，一般在一个表中时关联字段，在另外一个表中是主键，则这个字段建议设置为外键。
+
+## 2、对于已经存在的字段添加外键约束
+
+```sql
+-- 为cls_id字段添加外键约束
+alter table 数据表 add foreign key(外键字段) references 数据表(主键) 
+[on delete cascade| set null] [on update cascade | set null];
+
+# 可以设置 当主键删除或更新时，外键的动作
+```
+![](https://github.com/user-attachments/assets/fbb2a55a-41fc-4d98-92ad-0ef6d3ffb86e)
+
+## 3、在创建数据表时设置外键约束
+
+```sql
+-- 创建一个大哥表
+create table dage(
+  id int not null auto_increment,
+  name varchar(20),
+  primary key(id)
+) default charset=utf8;
+-- 添加测试数据
+insert into dage values (null, '陈浩南');
+insert into dage values (null, '乌鸦');
+
+
+-- 创建一个小弟表
+create table xiaodi(
+  id int not null auto_increment,
+  name varchar(20),
+  dage_id int,
+  primary key(id)
+) default charset=utf8;
+-- 把dage_id设置为主键
+alter table xiaodi add foreign key(dage_id) references dage(id) on delete cascade;
+
+-- 插入测试数据
+insert into xiaodi values (null, '山鸡', 1);
+insert into xiaodi values (null, '大天二', 1);
+insert into xiaodi values (null, '乌鸦的小弟', 2);
+
+
+-- 测试外键
+delete from dage where id = 2;
+select * from xiaodi;  -- 看看乌鸦的小弟是否还存在
+
+-- 删除外键
+show create table xiaodi; -- 查看外键名称(如xiaodi_ibfk_1)
+alter table xiaodi drop foreign key xiaodi_ibfk_1;
+
+```
+
+## 4、删除外键约束
+
+```sql
+-- 需要先获取外键约束名称,该名称系统会自动生成,可以通过查看表创建语句来获取名称
+show create table 数据表;
+
+-- 获取名称之后就可以根据名称来删除外键约束
+alter table 数据表 drop foreign key 外键名;
+```
+
+# 十三、子查询(三步走)
 
 ## 1、子查询（嵌套查询）的介绍
 
