@@ -490,7 +490,7 @@ INSERT INTO product VALUES (13,'海澜之家',1,'c002');
 
 ## 3、简单查询
 
-```mysql
+```sql
 # 1.查询所有的商品.  
 select * from product;
 # 2.查询商品名和商品价格. 
