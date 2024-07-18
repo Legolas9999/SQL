@@ -123,7 +123,7 @@ alter table 旧名称  rename  新名称;
 ```
 
 
-## 修改字段名称
+## 修改字段名称与类型
 
 修改字段名称与字段类型
 ```sql
@@ -399,6 +399,9 @@ create table person(
   last_name varchar(255) unique,      # 唯一约束
   gender enum('男','女') default '男'  # 默认值
 );
+
+# 对已有列设置默认值
+alter table 表名 alter column 字段名 set default 默认值;
 ```
 
 ## 5、外键约束(了解)
@@ -1030,8 +1033,80 @@ select * from students where (age, score) = (最小年龄, 最少成绩);
 select * from students where (age, score) = (select min(age), min(score) from students);
 ```
 
-## 3、小结
+# 十五、开窗函数(mysql 8.0)
 
-子查询是一个完整的SQL语句，子查询被嵌入到一对小括号里面
+## 1、数据准备
 
-掌握子查询编写三步走
+```sql
+create table employee (
+    empid int,
+    ename varchar(20) ,
+    deptid int,
+    salary decimal(10,2)
+) default charset=utf8;
+
+insert into employee values(1,'刘备',10,5500.00);
+insert into employee values(2,'赵云',10,4500.00);
+insert into employee values(2,'张飞',10,3500.00);
+insert into employee values(2,'关羽',10,4500.00);
+
+insert into employee values(3,'曹操',20,1900.00);
+insert into employee values(4,'许褚',20,4800.00);
+insert into employee values(5,'张辽',20,6500.00);
+insert into employee values(6,'徐晃',20,14500.00);
+
+insert into employee values(7,'孙权',30,44500.00);
+insert into employee values(8,'周瑜',30,6500.00);
+insert into employee values(9,'陆逊',30,7500.00);
+```
+
+## 2、开窗函数使用
+
+在不改变原有数据的情况下，增加一列保存聚合之后的结果
+
+* 格式:
+
+```sql
+select 
+  empid,   #原有的列
+  ename,
+  deptid,
+  开窗函数()/排序函数() over(partition by 分组字段 order by 排序字段) as 别名
+from 表名;
+where 条件
+```
+
+  * partition by ：相当于分组group by  
+  * order by ：相当于前面的order by
+  * 注意，where在开窗函数之前执行
+
+* 使用:
+
+```sql
+select *,
+row_number() over (partition by deptid order by salary) as row_n
+from employee;
+  
+  # select *,
+  #        row_number() over (order by salary) as row_n
+  # from employee;
+  
+  # 1. 查询每一个部门的薪资排名
+  select *,
+         row_number() over (partition by deptid order by salary) as row_n,
+         rank() over (partition by deptid order by salary) as rank_n,
+         dense_rank() over (partition by deptid order by salary) as drank_n
+  from employee;
+  
+  # 开窗函数:
+  # row_number：显示排序后的行数
+  # rank: 显示名次，可以并列排名，下一个排名会跳跃并列个数
+  # dense_rank: 显示名次，可以并列排名，下一个排名不会跳跃
+  
+  # 2. 查询每个部门薪资排名第2的员工;
+  select * from
+  (select
+      *,
+      dense_rank() over (partition by deptid order by salary desc) as row_n
+  from employee) c where c.row_n=2;
+```
